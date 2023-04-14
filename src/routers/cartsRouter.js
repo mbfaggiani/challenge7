@@ -1,54 +1,58 @@
-import express, {
-    json,
-    Router
-} from 'express';
-import { ProductManager } from '../managers/productManager.js';
-import { Product } from '../managers/productManager.js';
-import { CartManager } from '../managers/cartManager.js';
-import { randomUUID } from 'crypto'
-
+import express, { Router } from 'express'
+import { CM as cartManager } from '../dao/mongo/cart.manager.js'
 
 export const cartsRouter = Router()
+
 cartsRouter.use(express.json())
-cartsRouter.use(express.urlencoded({
-    extended: true
-}))
 
-
-const productManager = new ProductManager('./productos.txt');
-const cartManager = new CartManager('./carrito.txt')
-
-cartsRouter.get('/:cid', async (req, res) => {
+cartsRouter
+  .route('/:cid/product/:pid')
+  .post(async (req, res, next) => {
     try {
-        const id = req.params.cid
-        const carritoID = await cartManager.getCartById(id)
-
-        res.json(carritoID)
+      const response = await cartManager.addProductToCart(req.params.cid, req.params.pid)
+      res.status(response.status_code).json(response.productAdded)
     } catch (error) {
-        throw new Error("id de carrito no encontrado ")
+      return next(error.message)
     }
+  })
 
-})
-
-
-cartsRouter.get('/', async (req, res) => {
-
-    res.send(await cartManager.getCarts())
-})
-
-
-
-cartsRouter.post('/:cid/product/:pid', async (req, res) => {
+cartsRouter
+  .route('/:cid')
+  .get(async (req, res, next) => {
     try {
-        const cid = req.params.cid
-        const pid = req.params.pid
-
-const bla = await cartManager.agregarProductoAlCarrito(cid,pid)
-
-
-    res.json(bla)
+      const response = await cartManager.getCartById(req.params.cid)
+      res.status(response.status_code).json(
+        {
+          cart: response.cart,
+          totalProducts: response.totalProducts
+        })
     } catch (error) {
-        throw new Error('id no encontrado')
+      return next(error.message)
     }
-})
+  })
+  .delete(async (req, res, next) => {
+    try {
+      const response = await cartManager.deleteCart(req.params.cid)
+      res.status(response.status_code).json({ deleted: response.deleted, cart_deleted: response.carts_deleted })
+    } catch (error) {
+      return next(error.message)
+    }
+  })
 
+cartsRouter
+  .route('/')
+  .post(async (req, res, next) => {
+    try {
+      const response = await cartManager.createCart()
+      res.status(response.status_code).json(response.cart)
+    } catch (error) {
+      return next(error.message)
+    }
+  })
+  .get(async (req, res, next) => {
+    try {
+      throw new Error()
+    } catch (error) {
+      next(error.message)
+    }
+  })

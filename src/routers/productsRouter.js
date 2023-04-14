@@ -1,110 +1,57 @@
-import express, {Router} from 'express';
-import { Product, ProductManager } from '../managers/productManager.js';
-import { randomUUID } from 'crypto'
-
-export const productManager = new ProductManager('./productos.txt');
+import express, { Router } from 'express'
+import { PM as productManager } from '../dao/mongo/product.manager.js'
 
 export const productsRouter = Router()
+
 productsRouter.use(express.json())
-productsRouter.use(express.urlencoded({extended:true}))
 
-productsRouter.get('/', async (req,res)=>{
+productsRouter
+  .route('/:pid')
+  .get(async (req, res, next) => {
     try {
-        const poductosLeidos = await productManager.getProducts()
-
-        //obtengo parametro limit de las querys
-        const limite = req.query.limit;
-        let productosXPagina;
-
-        //si se brinda limite corto en el limite deseado.
-        if (limite) {
-            productosXPagina = poductosLeidos.slice(0, limite)
-            res.send(productosXPagina)
-        }
-
-        res.json(poductosLeidos)
+      const { pid: id } = req.params
+      const response = await productManager.getProductById({ id })
+      res.status(response.status_code).json({ product: response.item })
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+      return next(error.message)
     }
-
-} )
-
-productsRouter.get('/:pid', async (req,res)=>{
-
+  })
+  .put(async (req, res, next) => {
     try {
-        const idProducto = req.params.pid
-        const poductosLeidos = await productManager.getProducts()
-    
-    
-        if (idProducto) {
-             
-            let filtrado = poductosLeidos.find((prod) => prod.id === idProducto)
-    
-            if (filtrado) {
-    
-                res.send(filtrado)
-            } else {
-                throw new Error("no existe el id")
-            }
-    
-        }
+      const { pid: id } = req.params
+      const response = await productManager.updateProduct(id, req.body)
+
+      res.status(response.status_code).json(response.itemUpdated)
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+      return next(error.message)
     }
-
-
-} )
-
-productsRouter.post('/', async (req, res) => {
+  })
+  .delete(async (req, res, next) => {
     try {
-        await productManager.getProducts()
+      const { pid: id } = req.params
+      const response = await productManager.deleteProduct(id)
 
-        const producto1 = new Product({
-            ...req.body,
-            id: randomUUID()
-        })
-        console.log(producto1);
-        
-        const addProducto = await productManager.addProduct(producto1.title, producto1.description,producto1.price, producto1.thumbnail, producto1.stock, producto1.code,producto1.category)
-        res.json(addProducto)
+      res.status(response.status_code).json({ product_deleted: response.itemDeleted })
     } catch (error) {
-        throw new Error('aiuda')
+      return next(error.message)
     }
-})
+  })
 
-
-productsRouter.put('/:pid',async( req,res)=>{
-try {
-
-    const getProds = await productManager.getProducts()
-    const id= req.params.pid
-    const prodActualizado = req.body
-
-    await productManager.updateProduct(id,prodActualizado)
-
-    res.send('Producto actualizado correctamente')
-   
-} catch (error) {
-    throw new Error ('Error: no se encontro el producto filtrado. ')
-}
-} )
-
-productsRouter.delete('/:pid',async( req,res)=>{
+productsRouter
+  .route('/')
+  .get(async (req, res, next) => {
     try {
-    
-        const getProds = await productManager.getProducts()
-        const id= req.params.pid
-           
-        await productManager.deleteProduct(id)
-    
-        res.send('Producto eliminado correctamente')
-       
+      const products = await productManager.getProducts(req.query)
+      res.json(products)
     } catch (error) {
-        throw new Error ('Error: no se encontro el producto filtrado. ')
+      return next(error.message)
     }
-    } )
-
+  })
+  .post(async (req, res, next) => {
+    try {
+      const response = await productManager.addProduct(req.body)
+      res.status(response.status_code).json(response.productAdded)
+    } catch (error) {
+      return next(error.message)
+    }
+  })

@@ -4,9 +4,9 @@ import { engine } from 'express-handlebars'
 import { productsRouter } from '../routers/productsRouter.js'
 import { cartsRouter } from '../routers/cartsRouter.js'
 import { Server as SocketIOServer } from 'socket.io'
-import { ProductManager } from '../managers/productManager.js'
+import { ProductManager } from '../dao/mongo/product.manager.js'
 
-const productManager = new ProductManager('./productos.txt')
+const productManager = new ProductManager ('./productos.txt')
 
 const app = express()
 
