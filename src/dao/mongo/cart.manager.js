@@ -1,5 +1,18 @@
 import { CM_MONGO, PM_MONGO } from './database.manager.js'
 
+export class CartProduct {
+  constructor({ id, quantity }) {
+    this.id = id
+    this.quantity = quantity ?? 1
+  }
+}
+
+export class Cart {
+  constructor({ id }) {
+    this.id = id
+    this.products = []
+  }
+}
 class CartManager {
   #lastID
   constructor() {
