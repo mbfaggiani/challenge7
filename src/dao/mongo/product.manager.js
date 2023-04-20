@@ -1,4 +1,4 @@
-import { PM_MONGO } from './database.manager.js'
+import { DB_PRODUCTS } from './database.manager.js'
 
 export class Product {
   constructor({
@@ -30,13 +30,13 @@ export class ProductManager {
   }
 
   async getProducts() {
-    const products = await PM_MONGO.getItems()
+    const products = await DB_PRODUCTS.getItems()
     this.productsList = products
     return this.productsList
   }
 
   async getProductById(query) {
-    const product = await PM_MONGO.findProductByID(query)
+    const product = await DB_PRODUCTS.findProductByID(query)
     return product
   }
 
@@ -46,7 +46,7 @@ export class ProductManager {
     const newProduct = new Product(++this.#lastID, fields)
     this.productsList.push(newProduct)
 
-    await PM_MONGO.createItem(newProduct)
+    await DB_PRODUCTS.createItem(newProduct)
 
     return newProduct
     
@@ -62,12 +62,12 @@ export class ProductManager {
     product.price = fields.price ?? product.price
     product.stock = fields.stock ?? product.stock
 
-    await PM_MONGO.updateItem(product)
+    await DB_PRODUCTS.updateItem(product)
     return product
   }
 
   async deleteProduct(productId) {
-    const itemDeleted = await PM_MONGO.deleteProduct(productId)
+    const itemDeleted = await DB_PRODUCTS.deleteProduct(productId)
 
     return itemDeleted
   }
