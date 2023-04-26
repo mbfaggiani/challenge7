@@ -1,0 +1,22 @@
+<h2>{{mainTitle}}</h2>
+
+<form id="login_form">
+  <div class="mb-3">
+    <label for="input_email" class="form-label">Email</label>
+    <input required type="email" name="email" class="form-control" id="input_email" aria-describedby="emailHelp">
+    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+  </div>
+  <div class="mb-3">
+    <label for="input_password" class="form-label">Password</label>
+    <input required type="password" name="password" class="form-control" id="input_password">
+  </div>
+  <button type="submit" class="btn btn-primary">Log in</button>
+</form>
+
+<div>
+  <p id="message_container"></p>
+</div>
+
+<a href="/register" class="btn btn-primary" role="button">Need an account? Create one</a>
+
+<script src="/static/scripts/login.js"></script>

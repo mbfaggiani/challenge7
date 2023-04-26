@@ -1,0 +1,64 @@
+<h2>{{mainTitle}}</h2>
+
+<h3>Welcome {{name}}</h3>
+{{#if role}}
+<p>Access level: Admin</p>
+{{else}}
+<p>Access level: User</p>
+{{/if}}
+
+
+<a href={{urlToCart}} class="btn btn-primary" role="button">Go to my cart</a>
+<a href="/profile" class="btn btn-primary" role="button">Check my profile</a>
+
+
+{{#if listExist}}
+  <h4>Products:</h4>
+  <div class='container text-center mb-5'>
+    <div class='row row-gap-5'>
+      {{#each info.payload}}
+        <div class='col-3'>
+          <div class='card'>
+            <div class='card-body'>
+              <h5 class='card-title'>{{this.title}}</h5>
+              <p class='card-text'>{{this.description}}</p>
+            </div>
+            <ul class='list-group list-group-flush'>
+              <li class='list-group-item'>Item ID: {{this.id}}</li>
+              <li class='list-group-item'>Description: {{this.description}}</li>
+              <li class='list-group-item'>Price: ${{this.price}}</li>
+              <li class='list-group-item'>Stock: {{this.stock}}</li>
+              <button type="button" onclick="addProductToCart(this.dataset.productid)" data-productid={{this.id}} class="list-group-item list-group-item-action active" aria-current="true">
+                Add product to cart
+              </button>
+            </ul>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+{{else}}
+  <p class=''>Sin Products...</p>
+{{/if}}
+
+
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+  {{#if info.hasPrevPage}}
+      <li class='page-item'>
+    {{else}}
+      <li class='page-item disabled'>
+  {{/if}}
+      <a class="page-link" href={{info.prevLink}}>Previous Page</a>
+    </li>
+  {{#if info.hasNextPage}}
+      <li class='page-item'>
+    {{else}}
+      <li class='page-item disabled'>
+  {{/if}}
+      <a class="page-link" href={{info.nextLink}}>Next Page</a>
+    </li>
+  </ul>
+</nav>
+
+<script src="/static/scripts/products.js"></script>

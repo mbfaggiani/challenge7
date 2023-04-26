@@ -1,0 +1,27 @@
+<h2>{{mainTitle}}</h2>
+
+<form id="register_form">
+  <div class="mb-3">
+    <label for="input_email" class="form-label">Email</label>
+    <input required type="email" name="email" class="form-control" id="input_email" aria-describedby="emailHelp">
+    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+  </div>
+  <div class="input-group">
+    <span class="input-group-text">First and last name</span>
+    <input required type="text" name="first_name" aria-label="First name" class="form-control">
+    <input required type="text" name="last_name" aria-label="Last name" class="form-control">
+  </div>
+  <div class="mb-3">
+    <label for="input_age" class="form-label">Age</label>
+    <input required type="number" name="age" class="form-control" id="input_age" placeholder="99">
+  </div>
+  <div class="mb-3">
+    <label for="input_password" class="form-label">Password</label>
+    <input required type="password" name="password" class="form-control" id="input_password">
+  </div>
+  <button type="submit" class="btn btn-primary">Create Account</button>
+</form>
+
+<a href="/" class="btn btn-primary" role="button">Already have an account? Log in</a>
+
+<script src="/static/scripts/register.js"></script>

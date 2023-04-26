@@ -30,7 +30,7 @@ export class ProductManager {
   }
 
   async getProducts() {
-    const products = await DB_PRODUCTS.getItems()
+    const products = await DB_PRODUCTS.getProducts()
     this.productsList = products
     return this.productsList
   }

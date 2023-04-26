@@ -1,0 +1,18 @@
+<h2>{{mainTitle}}</h2>
+
+<a href="/products" class="btn btn-primary" role="button">Go to products</a>
+<button id="btn_logout" type="button" class="btn btn-danger">Logout</button>
+
+<ul class="list-group mt-3">
+
+  {{#if userInfo.role}}
+    <li class="list-group-item active" aria-current="true">Access: Admin</li>
+  {{else}}
+    <li class="list-group-item" aria-current="true">User</li>
+  {{/if}}
+  <li class="list-group-item">Email: {{userInfo.user}}</li>
+  <li class="list-group-item">Name: {{userInfo.name}}</li>
+  <li class="list-group-item">Age: {{userInfo.age}}</li>
+</ul>
+
+<script src="/static/scripts/profile.js"></script>
