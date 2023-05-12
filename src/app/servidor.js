@@ -1,13 +1,19 @@
 import express from 'express'
-import { PORT } from '../config/servidorconfig.js'
 import { engine } from 'express-handlebars'
-import { productsRouter } from '../routers/productsRouter.js'
-import { cartsRouter } from '../routers/cartsRouter.js'
-import { ProductManager } from '../dao/mongo/product.manager.js'
+import session from 'express-session'
+import cookieParser from "cookie-parser"
+import passport from 'passport'
+import initializePassport from '../config/passport.config.js'
+import cors from 'cors';
 
-const productManager = new ProductManager ('./productos.txt')
+import { PORT } from '../config/servidor.config.js'
+import { conectar } from '../database/mongoose.js'
+import { productsRouter } from '../routers/products.router.js'
+import { cartRouter } from '../routers/carts.router.js'
 
-const app = express()
+await conectar();
+
+const app = express();
 
 app.engine('handlebars', engine())
 app.set('views', './views')
@@ -15,31 +21,17 @@ app.set('view engine', 'handlebars')
 
 app.use(express.static('./public'))
 app.use(express.static('./static'))
-app.use('/api/products', productsRouter)
-app.use('/api/carts', cartsRouter)
+app.use(cors({origin: "*"}))
+app.use(cookieParser())
+app.use(session)
 
+app.use('/api/products', productsRouter)
+app.use('/api/carts', cartRouter)
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.listen(PORT, ()  => {
 console.log(`Escuchando en puerto ${PORT}`)
 });
-
-app.get('/', async (req, res) => {
-    res.json({"message":"Bienvenido al servidor"})
-});
-
-app.get('/home', async (req, res, next) => {
-    const listado1 = await productManager.getProducts()
-    
-
-    const producto = [];
-    listado1.forEach(element => {producto.push(JSON.stringify(element))
-        
-    });
-    
-        res.render('home.handlebars', {
-            titulo: 'Products',
-            encabezado: 'Lista de productos en base de datos',
-            producto,
-            hayProductos: producto.length > 0
-        })
-})

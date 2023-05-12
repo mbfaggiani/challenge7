@@ -1,78 +1,63 @@
-import { DB_PRODUCTS } from './database.manager.js'
+import productModel from "../mongo/models/products.schema.js"
+export default class ProductMangerDB{
 
-export class Product {
-  constructor({
-    id,
-    title,
-    description,
-    price,
-    code,
-    status = true,
-    stock = 0,
-    thumbnail = []
-  }) {
-    this.id = id
-    this.title = title
-    this.description = description
-    this.price = price
-    this.status = status
-    this.thumbnail = thumbnail
-    this.stock = stock
-    this.code = code ?? `code-${this.id}`
+  async getProduct(queryList){
+      const {query, sort} = queryList
+      
+      try{
+          if (queryList){
+              const productsParams = await productModel.paginate(query?{category: query}:{},{limit:queryList.limit || 10, page:queryList.page || 1});
+              if (sort === 'asc'){
+                  const productsParamas = await productModel.aggregate([
+                      {
+                          $sort: {price :1}
+                      }
+                  ])
+                  return productsParamas
+              }
+              if (sort === 'desc'){
+                  const productsParamas = await productModel.aggregate([
+                      {
+                          $sort: {price:-1}
+                      }
+                  ])
+                  return productsParamas
+              }
+               return productsParams; 
+          }
+      }
+      catch(err){
+          throw err; 
+      }
+  }
+
+  async createProduct(product) {
+      try {
+          const newProduct = new productModel(product);
+          await newProduct.save();
+          return product;
+      } catch (err) {
+          throw err;
+      }
+  }
+
+  async updateProduct(id, product) {
+      try{
+          const update = await productModel.findByIdAndUpdate(id, product);
+          return update;
+      }
+      catch (err) {
+          throw err;
+      }
+  }
+
+  async deleteProduct(id) {
+      try {
+          const deleteProd = await productModel.findByIdAndDelete(id);
+          return deleteProd;
+      }
+      catch (err) {
+          throw err;
+      }
   }
 }
-
-export class ProductManager {
-  #lastID
-  constructor() {
-    this.#lastID = 0
-    this.productsList = []
-  }
-
-  async getProducts() {
-    const products = await DB_PRODUCTS.getProducts()
-    this.productsList = products
-    return this.productsList
-  }
-
-  async getProductById(query) {
-    const product = await DB_PRODUCTS.findProductByID(query)
-    return product
-  }
-
-  async addProduct(fields) {
-    await this.getProducts()
-
-    const newProduct = new Product(++this.#lastID, fields)
-    this.productsList.push(newProduct)
-
-    await DB_PRODUCTS.createItem(newProduct)
-
-    return newProduct
-    
-  }
-
-  async updateProduct(productId, fields) {
-    const response = await this.getProductById(productId)
-    const product = response.item
-
-    product.description = fields.description ?? product.description
-    product.thumbnail = fields.thumbnail ?? product.thumbnail
-    product.title = fields.title ?? product.title
-    product.price = fields.price ?? product.price
-    product.stock = fields.stock ?? product.stock
-
-    await DB_PRODUCTS.updateItem(product)
-    return product
-  }
-
-  async deleteProduct(productId) {
-    const itemDeleted = await DB_PRODUCTS.deleteProduct(productId)
-
-    return itemDeleted
-  }
-}
-
-const PM = new ProductManager()
-
-export { PM }

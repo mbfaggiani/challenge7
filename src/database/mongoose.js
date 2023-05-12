@@ -1,8 +1,10 @@
 import mongoose, { Schema } from 'mongoose';
-import { MONGODB_CNX_STR } from '../config/database.js';
+import { MONGODB_CNX_STR } from '../config/database.config.js';
 
+export async function conectar() {
 await mongoose.connect(MONGODB_CNX_STR)
-console.log(`Conectado a base de datos en ${MONGODB_CNX_STR}`);
+console.log(`Base de datos conectada a ${MONGODB_CNX_STR}`);
+}
 
 export const schemaProducts = new Schema({
     title: { type: String, required: true },

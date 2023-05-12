@@ -10,4 +10,4 @@ cartSchema.plugin(mongoosePaginate)
 
 const cartModel = mongoose.model('carts', cartSchema)
 
-export { cartModel }
+export default { cartModel }
